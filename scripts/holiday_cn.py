@@ -55,7 +55,7 @@ def updateHolidayFile():
 
     def httpGetText(url):
         try:
-            req = requests.get(url, verify=False)
+            req = requests.get(url, verify=True)
             if req.status_code == 200:
                 return req.text
         except Exception as e:
