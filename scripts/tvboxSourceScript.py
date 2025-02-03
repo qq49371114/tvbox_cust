@@ -2,7 +2,7 @@ import os
 import re
 import base64
 import datetime
-import requests
+from security import safe_requests
 
 
 # 创建文件夹
@@ -12,7 +12,7 @@ if not os.path.exists("tvbox"):
 
 def httpGetText(url):
     try:
-        req = requests.get(url, verify=False)
+        req = safe_requests.get(url, verify=False)
         if req.status_code == 200:
             return req.text
     except Exception as e:
