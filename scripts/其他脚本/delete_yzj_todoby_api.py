@@ -17,7 +17,7 @@ ticket = 'APPURLWITHTI161xxxxxxxxxx'
 
 def httpGetText(url):
     try:
-        req = requests.get(url, verify=False)
+        req = requests.get(url, verify=False, timeout=60)
         if req.status_code == 200:
             return req.text
     except Exception as e:
@@ -31,7 +31,7 @@ def abandonTask(taskId):
     }
     body = {"taskId": str(taskId), "opMsg": "", "language": "zh-CN"}
     req2 = requests.post("https://www.yunzhijia.com/workflow/api/v1/flow/abandonFlow?appId=10104" +
-                         "&ticket="+ticket, data=body, headers=headers, verify=False)
+                         "&ticket="+ticket, data=body, headers=headers, verify=False, timeout=60)
     print("----" + req2.text)
 
 

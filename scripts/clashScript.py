@@ -22,7 +22,7 @@ def download_clash():
 
     def httpGetText(url):
         try:
-            req = requests.get(url, verify=False)
+            req = requests.get(url, verify=False, timeout=60)
             if req.status_code == 200:
                 return req.text
         except Exception as e:
@@ -118,7 +118,7 @@ def sendEmail(title, errorMsg):
 def sendTelegramBot(errorMsg):
     ret=True
     try:
-        r = requests.post(f'https://api.telegram.org/bot' + telegram_bot_token + '/sendMessage', json={"chat_id": telegram_bot_id, "text": errorMsg})
+        r = requests.post(f'https://api.telegram.org/bot' + telegram_bot_token + '/sendMessage', json={"chat_id": telegram_bot_id, "text": errorMsg}, timeout=60)
         if r.status_code == 200:
             ret=True
         else:
