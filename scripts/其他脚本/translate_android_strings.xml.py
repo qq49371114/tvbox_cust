@@ -1,7 +1,7 @@
-import xml.etree.ElementTree as ElementTree
 import os
 from googletrans import Translator
 from deep_translator import GoogleTranslator
+import defusedxml.ElementTree
 
 
 INFILE = input("Enter strings.xml file path（输入待翻译的strings.xml文件路径）")
@@ -46,7 +46,7 @@ for language_name in languages_to_translate:
     translated_file_directory = create_directories(language_to_translate)
     print(" -> " + language_to_translate + " =========================")
 
-    tree = ElementTree.parse(INFILE)
+    tree = defusedxml.ElementTree.parse(INFILE)
     root = tree.getroot()
     for i in range(len(root)):
 
