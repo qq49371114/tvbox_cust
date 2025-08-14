@@ -9,6 +9,8 @@ from base64 import b64encode, b64decode
 from urllib.parse import urlparse
 import requests
 from pyquery import PyQuery as pq
+from security import safe_requests
+
 sys.path.append('..')
 from base.spider import Spider
 
@@ -194,11 +196,11 @@ class Spider(Spider):
         return min(results.items(), key=lambda x: x[1])[0]
 
     def m3Proxy(self, url):
-        ydata = requests.get(url, headers=self.pheader, proxies=self.proxies, allow_redirects=False)
+        ydata = safe_requests.get(url, headers=self.pheader, proxies=self.proxies, allow_redirects=False)
         data = ydata.content.decode('utf-8')
         if ydata.headers.get('Location'):
             url = ydata.headers['Location']
-            data = requests.get(url, headers=self.pheader, proxies=self.proxies).content.decode('utf-8')
+            data = safe_requests.get(url, headers=self.pheader, proxies=self.proxies).content.decode('utf-8')
         lines = data.strip().split('\n')
         last_r = url[:url.rfind('/')]
         parsed_url = urlparse(url)
@@ -215,7 +217,7 @@ class Spider(Spider):
     def tsProxy(self, url,type):
         h=self.pheader.copy()
         if type=='img':h=self.headers.copy()
-        data = requests.get(url, headers=h, proxies=self.proxies, stream=True)
+        data = safe_requests.get(url, headers=h, proxies=self.proxies, stream=True)
         return [200, data.headers['Content-Type'], data.content]
 
     def proxy(self, data, type='img'):

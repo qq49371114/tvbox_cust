@@ -7,6 +7,7 @@ from lxml import etree
 from abc import abstractmethod, ABCMeta
 from importlib.machinery import SourceFileLoader
 from base.localProxy import Proxy
+from security import safe_requests
 
 class Spider(metaclass=ABCMeta):
     _instance = None
@@ -92,7 +93,7 @@ class Spider(metaclass=ABCMeta):
 
     def fetch(self, url, params=None, cookies=None, headers=None, timeout=5, verify=True, stream=False,
               allow_redirects=True):
-        rsp = requests.get(url, params=params, cookies=cookies, headers=headers, timeout=timeout, verify=verify,
+        rsp = safe_requests.get(url, params=params, cookies=cookies, headers=headers, timeout=timeout, verify=verify,
                            stream=stream, allow_redirects=allow_redirects)
         rsp.encoding = 'utf-8'
         return rsp

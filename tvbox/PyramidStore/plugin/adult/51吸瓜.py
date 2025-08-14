@@ -13,6 +13,8 @@ import requests
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from pyquery import PyQuery as pq
+from security import safe_requests
+
 sys.path.append('..')
 from base.spider import Spider
 
@@ -54,7 +56,7 @@ class Spider(Spider):
         pass
 
     def homeContent(self, filter):
-        data=self.getpq(requests.get(self.host, headers=self.headers,proxies=self.proxies).text)
+        data=self.getpq(safe_requests.get(self.host, headers=self.headers,proxies=self.proxies).text)
         result = {}
         classes = []
         for k in data('.category-list ul li').items():
@@ -74,7 +76,7 @@ class Spider(Spider):
             id = tid.replace('@folder', '')
             videos = self.getfod(id)
         else:
-            data = self.getpq(requests.get(f"{self.host}{tid}{pg}", headers=self.headers, proxies=self.proxies).text)
+            data = self.getpq(safe_requests.get(f"{self.host}{tid}{pg}", headers=self.headers, proxies=self.proxies).text)
             videos = self.getlist(data('#archive article a'), tid)
         result = {}
         result['list'] = videos
@@ -86,7 +88,7 @@ class Spider(Spider):
 
     def detailContent(self, ids):
         url=f"{self.host}{ids[0]}"
-        data=self.getpq(requests.get(url, headers=self.headers,proxies=self.proxies).text)
+        data=self.getpq(safe_requests.get(url, headers=self.headers,proxies=self.proxies).text)
         vod = {'vod_play_from': '51吸瓜'}
         try:
             clist = []
@@ -110,7 +112,7 @@ class Spider(Spider):
         return {'list':[vod]}
 
     def searchContent(self, key, quick, pg="1"):
-        data=self.getpq(requests.get(f"{self.host}/search/{key}/{pg}", headers=self.headers,proxies=self.proxies).text)
+        data=self.getpq(safe_requests.get(f"{self.host}/search/{key}/{pg}", headers=self.headers,proxies=self.proxies).text)
         return {'list':self.getlist(data('#archive article a')),'page':pg}
 
     def playerContent(self, flag, id, vipFlags):
@@ -120,7 +122,7 @@ class Spider(Spider):
 
     def localProxy(self, param):
         if param.get('type') == 'img':
-            res=requests.get(param['url'], headers=self.headers, proxies=self.proxies, timeout=10)
+            res=safe_requests.get(param['url'], headers=self.headers, proxies=self.proxies, timeout=10)
             return [200,res.headers.get('Content-Type'),self.aesimg(res.content)]
         elif param.get('type') == 'm3u8':return self.m3Proxy(param['url'])
         else:return self.tsProxy(param['url'])
@@ -131,11 +133,11 @@ class Spider(Spider):
 
     def m3Proxy(self, url):
         url=self.d64(url)
-        ydata = requests.get(url, headers=self.headers, proxies=self.proxies, allow_redirects=False)
+        ydata = safe_requests.get(url, headers=self.headers, proxies=self.proxies, allow_redirects=False)
         data = ydata.content.decode('utf-8')
         if ydata.headers.get('Location'):
             url = ydata.headers['Location']
-            data = requests.get(url, headers=self.headers, proxies=self.proxies).content.decode('utf-8')
+            data = safe_requests.get(url, headers=self.headers, proxies=self.proxies).content.decode('utf-8')
         lines = data.strip().split('\n')
         last_r = url[:url.rfind('/')]
         parsed_url = urlparse(url)
@@ -159,7 +161,7 @@ class Spider(Spider):
 
     def tsProxy(self, url):
         url = self.d64(url)
-        data = requests.get(url, headers=self.headers, proxies=self.proxies, stream=True)
+        data = safe_requests.get(url, headers=self.headers, proxies=self.proxies, stream=True)
         return [200, data.headers['Content-Type'], data.content]
 
     def e64(self, text):
@@ -185,14 +187,14 @@ class Spider(Spider):
         curl = self.getCache('host_51cn')
         if curl:
             try:
-                data = self.getpq(requests.get(curl, headers=self.headers, proxies=self.proxies).text)('a').attr('href')
+                data = self.getpq(safe_requests.get(curl, headers=self.headers, proxies=self.proxies).text)('a').attr('href')
                 if data:
                     parsed_url = urlparse(data)
                     url = parsed_url.scheme + "://" + parsed_url.netloc
             except:
                 pass
         try:
-            html = self.getpq(requests.get(url, headers=self.headers, proxies=self.proxies).text)
+            html = self.getpq(safe_requests.get(url, headers=self.headers, proxies=self.proxies).text)
             html_pattern = r"Base64\.decode\('([^']+)'\)"
             html_match = re.search(html_pattern, html('script').eq(-1).text(), re.DOTALL)
             if not html_match: raise Exception("未找到html")
@@ -203,7 +205,7 @@ class Spider(Spider):
             return ""
 
     def getcnh(self):
-        data=self.getpq(requests.get(f"{self.host}/ybml.html", headers=self.headers,proxies=self.proxies).text)
+        data=self.getpq(safe_requests.get(f"{self.host}/ybml.html", headers=self.headers,proxies=self.proxies).text)
         url=data('.post-content[itemprop="articleBody"] blockquote p').eq(0)('a').attr('href')
         parsed_url = urlparse(url)
         host = parsed_url.scheme + "://" + parsed_url.netloc
@@ -313,7 +315,7 @@ class Spider(Spider):
 
     def getfod(self, id):
         url = f"{self.host}{id}"
-        data = self.getpq(requests.get(url, headers=self.headers, proxies=self.proxies).text)
+        data = self.getpq(safe_requests.get(url, headers=self.headers, proxies=self.proxies).text)
         vdata=data('.post-content[itemprop="articleBody"]')
         r=['.txt-apps','.line','blockquote','.tags','.content-tabs']
         for i in r:vdata.remove(i)
