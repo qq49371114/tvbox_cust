@@ -4,11 +4,11 @@ import json
 import re
 import sys
 from urllib.parse import urlparse
-
-import requests
 from pyquery import PyQuery as pq
 from base64 import b64decode, b64encode
 from requests import Session
+from security import safe_requests
+
 sys.path.append('..')
 from base.spider import Spider
 
@@ -249,11 +249,11 @@ class Spider(Spider):
             return pq(response.encode('utf-8'))
 
     def m3Proxy(self, url):
-        ydata = requests.get(url, headers=self.headers, proxies=self.proxies, allow_redirects=False)
+        ydata = safe_requests.get(url, headers=self.headers, proxies=self.proxies, allow_redirects=False)
         data = ydata.content.decode('utf-8')
         if ydata.headers.get('Location'):
             url = ydata.headers['Location']
-            data = requests.get(url, headers=self.headers, proxies=self.proxies).content.decode('utf-8')
+            data = safe_requests.get(url, headers=self.headers, proxies=self.proxies).content.decode('utf-8')
         lines = data.strip().split('\n')
         last_r = url[:url.rfind('/')]
         parsed_url = urlparse(url)
@@ -268,7 +268,7 @@ class Spider(Spider):
         return [200, "application/vnd.apple.mpegur", data]
 
     def tsProxy(self, url):
-        data = requests.get(url, headers=self.headers, proxies=self.proxies, stream=True)
+        data = safe_requests.get(url, headers=self.headers, proxies=self.proxies, stream=True)
         return [200, data.headers['Content-Type'], data.content]
 
     def proxy(self, data, type='img'):

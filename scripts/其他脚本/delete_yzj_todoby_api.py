@@ -8,6 +8,7 @@
 import requests
 import json
 from concurrent.futures import ThreadPoolExecutor
+from security import safe_requests
 
 # 登录后的cookie
 cookie = 'logintype5b45a7bae4b0254557bxxxxxxxxx'
@@ -17,7 +18,7 @@ ticket = 'APPURLWITHTI161xxxxxxxxxx'
 
 def httpGetText(url):
     try:
-        req = requests.get(url, verify=False)
+        req = safe_requests.get(url, verify=False)
         if req.status_code == 200:
             return req.text
     except Exception as e:

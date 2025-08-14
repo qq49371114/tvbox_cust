@@ -5,10 +5,10 @@ import re
 import sys
 from base64 import b64decode, b64encode
 from urllib.parse import urlparse
-
-import requests
 from pyquery import PyQuery as pq
 from requests import Session
+from security import safe_requests
+
 sys.path.append('..')
 from base.spider import Spider
 
@@ -227,11 +227,11 @@ class Spider(Spider):
             return self.tsProxy(url)
 
     def m3Proxy(self, url):
-        ydata = requests.get(url, headers=self.headers, proxies=self.proxies, allow_redirects=False)
+        ydata = safe_requests.get(url, headers=self.headers, proxies=self.proxies, allow_redirects=False)
         data = ydata.content.decode('utf-8')
         if ydata.headers.get('Location'):
             url = ydata.headers['Location']
-            data = requests.get(url, headers=self.headers, proxies=self.proxies).content.decode('utf-8')
+            data = safe_requests.get(url, headers=self.headers, proxies=self.proxies).content.decode('utf-8')
         lines = data.strip().split('\n')
         last_r = url[:url.rfind('/')]
         parsed_url = urlparse(url)
@@ -246,12 +246,12 @@ class Spider(Spider):
         return [200, "application/vnd.apple.mpegur", data]
 
     def tsProxy(self, url):
-        data = requests.get(url, headers=self.headers, proxies=self.proxies, stream=True)
+        data = safe_requests.get(url, headers=self.headers, proxies=self.proxies, stream=True)
         return [200, data.headers['Content-Type'], data.content]
 
     def gethost(self):
         try:
-            response = requests.get('https://www.pornhub.com', headers=self.headers, proxies=self.proxies,
+            response = safe_requests.get('https://www.pornhub.com', headers=self.headers, proxies=self.proxies,
                                     allow_redirects=False)
             return response.headers['Location'][:-1]
         except Exception as e:

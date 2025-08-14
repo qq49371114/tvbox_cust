@@ -7,6 +7,7 @@ import base64
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
+from security import safe_requests
 
 
 # 时间
@@ -22,7 +23,7 @@ def download_clash():
 
     def httpGetText(url):
         try:
-            req = requests.get(url, verify=False)
+            req = safe_requests.get(url, verify=False)
             if req.status_code == 200:
                 return req.text
         except Exception as e:
